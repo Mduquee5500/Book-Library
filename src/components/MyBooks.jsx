@@ -4,11 +4,13 @@ import React, { useState, useEffect } from "react";
 import { getMyBooks } from "../usecases/getMyBooks";
 import { updateBookRating } from "../usecases/updateBookRating";
 import { removeBookFromLibrary } from "../usecases/removeBookFromLibrary";
+import { Modal } from "./Modal";
 
 export const MyBooks = () => {
   const [myList, setMyList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     loadMyBooks();
@@ -150,7 +152,14 @@ export const MyBooks = () => {
         {myList.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {myList.map((book) => (
-              <div key={book.id} className="group">
+              <div
+                key={book.id}
+                className="group"
+                onClick={() => {
+                  console.log("Card listener: ", book.title);
+                  setSelectedBook(book);
+                }}
+              >
                 <div className="bg-gradient-to-br from-amber-50 to-red-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-red-200 hover:border-red-400 overflow-hidden h-full">
                   {/* Book Cover */}
                   <div className="relative h-64 bg-gradient-to-br from-red-100 to-amber-100">
@@ -320,6 +329,15 @@ export const MyBooks = () => {
           </div>
         )}
       </div>
+      {/* Modal */}
+      <Modal
+        selectedBook={selectedBook}
+        isOpen={selectedBook !== null}
+        onClose={() => setSelectedBook(null)}
+        context="library"
+        onUpdateRating={handleUpdateRating}
+        onRemove={handleRemoveBook}
+      />
     </div>
   );
 };

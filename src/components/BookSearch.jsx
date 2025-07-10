@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { searchBooks as search } from "../usecases/searchBooks.jsx";
 import { addBookToLibrary } from "../usecases/addBookToLibrary.jsx";
+import { Modal } from "./Modal";
 
 // Component
 export const BookSearch = () => {
@@ -10,6 +11,7 @@ export const BookSearch = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBook, setSelectedBook] = useState(null);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -149,7 +151,15 @@ export const BookSearch = () => {
         {bookList.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {bookList.map((book) => (
-              <div key={book.id} className="group">
+              <div
+                key={book.id}
+                className="group cursor-pointer"
+                onClick={() => {
+                  console.log("Card listener", book.title);
+                  console.log();
+                  setSelectedBook(book);
+                }}
+              >
                 <div className="bg-gradient-to-br from-amber-50 to-red-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-red-200 hover:border-red-400 overflow-hidden h-full">
                   {/* Book Cover */}
                   <div className="relative h-64 bg-gradient-to-br from-red-100 to-amber-100">
@@ -296,6 +306,16 @@ export const BookSearch = () => {
           </div>
         )}
       </div>
+      {/* Modal */}
+      <Modal
+        selectedBook={selectedBook}
+        isOpen={selectedBook !== null}
+        onClose={() => setSelectedBook(null)}
+        context="browse"
+        onAddToLibrary={() => {
+          addBookToLibrary(selectedBook, 1, "");
+        }}
+      />
     </div>
   );
 };
