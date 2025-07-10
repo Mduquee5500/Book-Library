@@ -1,4 +1,5 @@
 import { BookSearch } from "./components/BookSearch.jsx";
+import { MyBooks } from "./components/MyBooks.jsx";
 import "./App.css";
 import { useState } from "react";
 
@@ -55,7 +56,7 @@ function App() {
 
       {/* Conditional Content */}
       {activeTab === "browse" && <BookSearch />}
-      {activeTab === "library" && <div>My Library Component</div>}
+      {activeTab === "library" && <MyBooks />}
 
       {/* Footer */}
       <footer className="bg-gradient-to-r from-red-900 to-red-800 mt-16">

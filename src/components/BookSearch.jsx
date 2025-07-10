@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { searchBooks as search } from "../usecases/searchBooks.jsx";
+import { addBookToLibrary } from "../usecases/addBookToLibrary.jsx";
 
 // Component
 export const BookSearch = () => {
@@ -239,6 +240,29 @@ export const BookSearch = () => {
                         </p>
                       </div>
                     )}
+
+                    {/* Add Button */}
+                    <div className="mt-6 pt-4 border-t border-red-200">
+                      <button
+                        onClick={() => addBookToLibrary(book, 1, "")}
+                        className="w-full bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-800 text-amber-100 font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                        Add to Library
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
