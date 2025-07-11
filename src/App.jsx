@@ -2,6 +2,7 @@ import { BookSearch } from "./components/BookSearch.jsx";
 import { MyBooks } from "./components/MyBooks.jsx";
 import "./App.css";
 import { useState } from "react";
+import { RatingModal } from "./components/RatingModal.jsx";
 
 function App() {
   const [activeTab, setActiveTab] = useState("browse");

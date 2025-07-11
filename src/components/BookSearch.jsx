@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { searchBooks as search } from "../usecases/searchBooks.jsx";
 import { addBookToLibrary } from "../usecases/addBookToLibrary.jsx";
 import { Modal } from "./Modal";
+import { Toast } from "./Toast.jsx";
 
 // Component
 export const BookSearch = () => {
@@ -12,6 +13,9 @@ export const BookSearch = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBook, setSelectedBook] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -255,7 +259,13 @@ export const BookSearch = () => {
                     {/* Add Button */}
                     <div className="mt-6 pt-4 border-t border-red-200">
                       <button
-                        onClick={() => addBookToLibrary(book, 1, "")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addBookToLibrary(book, 1, "");
+                          setToastMessage("Book added to your library");
+                          setToastType("success");
+                          setShowToast(true);
+                        }}
                         className="w-full bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-800 text-amber-100 font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2"
                       >
                         <svg
@@ -316,6 +326,15 @@ export const BookSearch = () => {
         onAddToLibrary={() => {
           addBookToLibrary(selectedBook, 1, "");
         }}
+      />
+
+      {/* Toast */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={3000}
       />
     </div>
   );

@@ -5,12 +5,26 @@ import { getMyBooks } from "../usecases/getMyBooks";
 import { updateBookRating } from "../usecases/updateBookRating";
 import { removeBookFromLibrary } from "../usecases/removeBookFromLibrary";
 import { Modal } from "./Modal";
+import { Toast } from "./Toast";
+import { ConfirmModal } from "./ConfirmModal";
+import { RatingModal } from "./RatingModal";
 
 export const MyBooks = () => {
   const [myList, setMyList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [selectedBook, setSelectedBook] = useState(null);
+  const [showBookModal, setShowBookModal] = useState(false);
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState(null);
+
+  const [showRating, setShowRating] = useState(false);
 
   useEffect(() => {
     loadMyBooks();
@@ -35,21 +49,43 @@ export const MyBooks = () => {
     try {
       await updateBookRating(id, newRating);
       await loadMyBooks();
+      setToastMessage("Rating updated successfully");
+      setToastType("success");
+      setShowToast(true);
     } catch (error) {
       setError(error.message);
+      setToastMessage("Error updating rating");
+      setToastType("error");
+      setShowToast(true);
     }
   };
 
   const handleRemoveBook = async (id) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      try {
-        await removeBookFromLibrary(id);
-        await loadMyBooks();
-      } catch (error) {
-        setError(error.message);
-      }
-    } else {
-      return;
+    try {
+      setBookToDelete(id);
+      setShowConfirmModal(true);
+    } catch (error) {
+      setError(error.message);
+      setToastMessage("Error deleting book");
+      setToastType("error");
+      setShowToast(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await removeBookFromLibrary(bookToDelete);
+      await loadMyBooks();
+      setToastMessage("Book deleted successfully");
+      setToastType("success");
+      setShowToast(true);
+    } catch (error) {
+      setToastMessage("Error al eliminar libro");
+      setToastType("error");
+      setShowToast(true);
+    } finally {
+      setShowConfirmModal(false);
+      setBookToDelete(null);
     }
   };
 
@@ -158,6 +194,7 @@ export const MyBooks = () => {
                 onClick={() => {
                   console.log("Card listener: ", book.title);
                   setSelectedBook(book);
+                  setShowBookModal(true);
                 }}
               >
                 <div className="bg-gradient-to-br from-amber-50 to-red-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-red-200 hover:border-red-400 overflow-hidden h-full">
@@ -275,13 +312,11 @@ export const MyBooks = () => {
                     <div className="flex gap-3 mt-6 pt-4 border-t border-red-200">
                       {/* Edit Rating Button */}
                       <button
-                        onClick={() => {
-                          const newRating = prompt(
-                            "Rate this book (1-5):",
-                            book.rating
-                          );
-                          if (newRating)
-                            handleUpdateRating(book.id, parseInt(newRating));
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowBookModal(false);
+                          setSelectedBook(book);
+                          setShowRating(true);
                         }}
                         className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
                       >
@@ -303,7 +338,10 @@ export const MyBooks = () => {
 
                       {/* Delete Button */}
                       <button
-                        onClick={() => handleRemoveBook(book.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveBook(book.id);
+                        }}
                         className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
                       >
                         <svg
@@ -332,11 +370,39 @@ export const MyBooks = () => {
       {/* Modal */}
       <Modal
         selectedBook={selectedBook}
-        isOpen={selectedBook !== null}
+        isOpen={showBookModal}
         onClose={() => setSelectedBook(null)}
         context="library"
         onUpdateRating={handleUpdateRating}
         onRemove={handleRemoveBook}
+      />
+
+      {/* Toast */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={3000}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Delete book?"
+        message="This action cannot be undone, want to proceed?"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmModal(false)}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      {/* Rating */}
+      <RatingModal
+        isOpen={showRating}
+        onCancel={() => setShowRating(false)}
+        book={selectedBook}
+        onRatingSubmit={handleUpdateRating}
       />
     </div>
   );
