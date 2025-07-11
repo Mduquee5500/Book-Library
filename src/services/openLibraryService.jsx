@@ -1,7 +1,7 @@
-// Responsability / Concern: Talk with Google API
+// Responsability / Concern: Talk with Open Library API
 
-export const searchBooks = async (searchTerm) => {
-  const apiUrl = "https://www.googleapis.com/books/v1/volumes";
+export const searchBookOpenLibrary = async (searchTerm) => {
+  const apiUrl = "https://openlibrary.org/search.json";
 
   if (!searchTerm || searchTerm.trim().length < 2) {
     throw new Error("Search mus be at least 2 characters");
@@ -9,7 +9,7 @@ export const searchBooks = async (searchTerm) => {
 
   try {
     const encodeUrl = encodeURIComponent(searchTerm);
-    const finalUrlBook = apiUrl + "?q=" + encodeUrl + "&maxResults=20";
+    const finalUrlBook = `${apiUrl}?q=${encodeUrl}&limit=20`;
 
     const response = await fetch(finalUrlBook);
 
@@ -18,7 +18,7 @@ export const searchBooks = async (searchTerm) => {
     }
 
     const data = await response.json();
-    return data.items || [];
+    return data.docs || [];
   } catch (error) {
     throw new Error("Error: ", error);
   }

@@ -27,6 +27,7 @@ export const BookSearch = () => {
       const books = await search(searchTerm);
       setBookList(books);
     } catch (error) {
+      console.log("Error in component:", error);
       setError("Failed fetching books");
       setBookList([]);
     } finally {
